@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import { getReviews, getStats } from "@/lib/csv-reader";
+import FloatingContactBar from "@/components/floating-contact-bar";
 
 export const metadata: Metadata = {
   title: "Trusted In-Home Dog Sitting in Omaha, NE",
@@ -25,6 +26,9 @@ export default async function Home() {
   const displayReviews = reviews.filter(r => r.comment).slice(0, 3);
   return (
     <main className="min-h-screen bg-white">
+      {/* Floating Action Button */}
+      <FloatingContactBar />
+
       {/* Schema.org Local Business JSON-LD */}
       <script
         type="application/ld+json"

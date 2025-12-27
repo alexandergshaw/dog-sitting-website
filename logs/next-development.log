@@ -1,0 +1,4 @@
+[00:05:59.584] Server  ERROR   Error: ENOENT: no such file or directory, scandir '/workspaces/dog-sitting-website/dogsitting-site/app'
+[00:05:59.602] Server  ERROR   ⨯ "unhandledRejection:" Error: ENOENT: no such file or directory, scandir '/workspaces/dog-sitting-website/dogsitting-site/app'
+[00:05:59.608] Server  ERROR   ⨯ "unhandledRejection: " Error: ENOENT: no such file or directory, scandir '/workspaces/dog-sitting-website/dogsitting-site/app'
+[00:05:59.652] Server  LOG     ✓ Compiled in 149ms

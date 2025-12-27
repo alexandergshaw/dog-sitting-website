@@ -1,45 +1,39 @@
-// app/api/book/route.ts
+import { EmailTemplate } from '@/components/email-template';
+import { Resend } from 'resend';
+import { NextRequest } from 'next/server';
 
-import { NextResponse } from "next/server";
+const resend = new Resend('re_JoDbdqu4_GeSzBqroU36pLB2La2Szk1nJ');
 
-export async function POST(req: Request) {
-  const formData = await req.formData();
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { name, email, dates, details, company } = body;
 
-  // Honeypot check
-  if (formData.get("company")) {
-    return new NextResponse("OK", { status: 200 });
-  }
+    // Check honeypot field - if filled, it's likely a bot
+    if (company) {
+      return Response.json({ error: 'Invalid submission' }, { status: 400 });
+    }
 
-  const name = formData.get("name")?.toString().trim();
-  const email = formData.get("email")?.toString().trim();
-  const dates = formData.get("dates")?.toString().trim();
-  const details = formData.get("details")?.toString().trim();
+    // Validate required fields
+    if (!name || !email || !dates || !details) {
+      return Response.json({ error: 'Missing required fields' }, { status: 400 });
+    }
 
-  if (!name || !email || !dates || !details) {
-    return new NextResponse("Missing required fields", { status: 400 });
-  }
-
-  // Integration point (explicit, not magical)
-  // Examples:
-  // - send email via Resend, Postmark, SES
-  // - send webhook to Notion / Slack
-  // - write to database
-  //
-  // Controlled via env vars so local/dev/prod behave cleanly
-
-  const ENABLE_LOGGING = process.env.LOG_BOOKINGS === "true";
-
-  if (ENABLE_LOGGING) {
-    console.log("New booking request:", {
-      name,
-      email,
-      dates,
-      details,
+    const { data, error } = await resend.emails.send({
+      from: 'onboarding@resend.dev',
+      to: 'alexandergshaw@gmail.com',
+      subject: 'Hello World',
+      html: '<p>Congrats on sending your <strong>first email</strong>!</p>'
     });
-  }
 
-  return NextResponse.redirect(
-    new URL("/thanks", req.url),
-    { status: 303 }
-  );
+    if (error) {
+      console.error('Resend error:', error);
+      return Response.json({ error: error.message }, { status: 500 });
+    }
+
+    return Response.json({ success: true, data });
+  } catch (error) {
+    console.error('Server error:', error);
+    return Response.json({ error: 'Failed to send email' }, { status: 500 });
+  }
 }

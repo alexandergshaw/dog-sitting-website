@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import Image from "next/image";
+import { getReviews, getStats } from "@/lib/csv-reader";
 
 export const metadata: Metadata = {
   title: "Trusted In-Home Dog Sitting in Omaha, NE",
@@ -18,7 +18,10 @@ export const metadata: Metadata = {
 };
 
 
-export default function Home() {
+export default async function Home() {
+  const reviews = await getReviews();
+  const stats = await getStats();
+  const displayReviews = reviews.slice(0, 3); // Show first 3 reviews
   return (
     <main className="min-h-screen bg-white">
       {/* Schema.org Local Business JSON-LD */}
@@ -90,21 +93,21 @@ export default function Home() {
               <svg className="w-5 h-5 text-yellow-300" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
               </svg>
-              <span className="font-semibold">5.0 Rating</span>
+              <span className="font-semibold">{stats.rating} Rating</span>
             </div>
             <div className="hidden sm:block w-px h-6 bg-white/30"></div>
             <div className="flex items-center gap-2">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
               </svg>
-              <span className="font-semibold">100+ Happy Dogs</span>
+              <span className="font-semibold">{stats.total_dogs}+ Happy Dogs</span>
             </div>
             <div className="hidden sm:block w-px h-6 bg-white/30"></div>
             <div className="flex items-center gap-2">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
               </svg>
-              <span className="font-semibold">5+ Years Experience</span>
+              <span className="font-semibold">{stats.years_experience}+ Years Experience</span>
             </div>
           </div>
 
@@ -298,79 +301,42 @@ export default function Home() {
               Loved by Omaha Pet Parents
             </h2>
             <p className="text-xl text-gray-600">
-              5.0 rating from 47 happy families
+              {stats.rating} rating from {stats.total_reviews} happy families
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {/* Testimonial 1 */}
-            <div className="bg-white p-8 rounded-3xl shadow-lg hover:shadow-xl transition-shadow">
-              <div className="flex mb-4">
-                {[...Array(5)].map((_, i) => (
-                  <svg key={i} className="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                  </svg>
-                ))}
-              </div>
-              <p className="text-gray-700 text-lg leading-relaxed mb-6">
-                "Best dog sitter in Omaha! My golden retriever Max was so happy and well-cared for. The daily photo updates were amazing while I was on vacation."
-              </p>
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                  SM
+            {displayReviews.map((review, index) => {
+              const colors = [
+                'from-blue-500 to-indigo-600',
+                'from-purple-500 to-pink-600',
+                'from-indigo-500 to-blue-600'
+              ];
+              const initials = review.name.split(' ').map(n => n[0]).join('');
+              
+              return (
+                <div key={index} className="bg-white p-8 rounded-3xl shadow-lg hover:shadow-xl transition-shadow">
+                  <div className="flex mb-4">
+                    {[...Array(review.rating)].map((_, i) => (
+                      <svg key={i} className="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                      </svg>
+                    ))}
+                  </div>
+                  <p className="text-gray-700 text-lg leading-relaxed mb-6">
+                    &ldquo;{review.comment}&rdquo;
+                  </p>
+                  <div className="flex items-center gap-4">
+                    <div className={`w-14 h-14 bg-gradient-to-br ${colors[index]} rounded-full flex items-center justify-center text-white font-bold text-lg`}>
+                      {initials}
+                    </div>
+                    <div>
+                      <p className="font-bold text-gray-900">{review.name}</p>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-bold text-gray-900">Sarah M.</p>
-                  <p className="text-gray-500">Dundee</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Testimonial 2 */}
-            <div className="bg-white p-8 rounded-3xl shadow-lg hover:shadow-xl transition-shadow">
-              <div className="flex mb-4">
-                {[...Array(5)].map((_, i) => (
-                  <svg key={i} className="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                  </svg>
-                ))}
-              </div>
-              <p className="text-gray-700 text-lg leading-relaxed mb-6">
-                "Reliable and professional pet sitting service! Our rescue dog has anxiety, but she was so comfortable with the overnight care. Highly recommend!"
-              </p>
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                  MT
-                </div>
-                <div>
-                  <p className="font-bold text-gray-900">Mike & Jennifer T.</p>
-                  <p className="text-gray-500">Aksarben</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Testimonial 3 */}
-            <div className="bg-white p-8 rounded-3xl shadow-lg hover:shadow-xl transition-shadow">
-              <div className="flex mb-4">
-                {[...Array(5)].map((_, i) => (
-                  <svg key={i} className="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                  </svg>
-                ))}
-              </div>
-              <p className="text-gray-700 text-lg leading-relaxed mb-6">
-                "We've tried several dog walkers and pet sitters in West Omaha, and this is by far the best. Our lab mix gets so excited when she arrives!"
-              </p>
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                  RK
-                </div>
-                <div>
-                  <p className="font-bold text-gray-900">Robert K.</p>
-                  <p className="text-gray-500">West Omaha</p>
-                </div>
-              </div>
-            </div>
+              );
+            })}
           </div>
         </div>
       </section>

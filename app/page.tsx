@@ -21,7 +21,8 @@ export const metadata: Metadata = {
 export default async function Home() {
   const reviews = await getReviews();
   const stats = await getStats();
-  const displayReviews = reviews.slice(0, 3); // Show first 3 reviews
+  // Show first 3 reviews that have comments
+  const displayReviews = reviews.filter(r => r.comment).slice(0, 3);
   return (
     <main className="min-h-screen bg-white">
       {/* Schema.org Local Business JSON-LD */}
@@ -108,6 +109,13 @@ export default async function Home() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
               </svg>
               <span className="font-semibold">{stats.years_experience}+ Years Experience</span>
+            </div>
+            <div className="hidden sm:block w-px h-6 bg-white/30"></div>
+            <div className="flex items-center gap-2">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+              </svg>
+              <span className="font-semibold">{stats.repeat_clients} Repeat Customers</span>
             </div>
           </div>
 
@@ -312,7 +320,7 @@ export default async function Home() {
                 'from-purple-500 to-pink-600',
                 'from-indigo-500 to-blue-600'
               ];
-              const initials = review.name.split(' ').map(n => n[0]).join('');
+              const initials = review.owner_name.split(' ').map(n => n[0]).join('');
               
               return (
                 <div key={index} className="bg-white p-8 rounded-3xl shadow-lg hover:shadow-xl transition-shadow">
@@ -331,7 +339,8 @@ export default async function Home() {
                       {initials}
                     </div>
                     <div>
-                      <p className="font-bold text-gray-900">{review.name}</p>
+                      <p className="font-bold text-gray-900">{review.owner_name}</p>
+                      <p className="text-sm text-gray-600">{review.dog_name}'s Owner</p>
                     </div>
                   </div>
                 </div>

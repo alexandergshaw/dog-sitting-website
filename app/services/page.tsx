@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import { getStats } from "@/lib/csv-reader";
 
 export const metadata: Metadata = {
   title: "Dog Sitting Services in Omaha | In-Home & Overnight Care",
@@ -15,15 +16,20 @@ export const metadata: Metadata = {
     type: "website",
   },
 };
-export default function ServicesPage() {
+export default async function ServicesPage() {
+  const stats = await getStats();
+  
   return (
     <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-4xl font-bold text-gray-900 mb-6 text-center">
           Dog Sitting Services
         </h1>
-        <p className="text-lg text-gray-700 text-center mb-12 max-w-2xl mx-auto">
+        <p className="text-lg text-gray-700 text-center mb-4 max-w-2xl mx-auto">
           Professional, reliable dog sitting services in Omaha tailored to your dog's needs.
+        </p>
+        <p className="text-center text-blue-600 font-semibold mb-12">
+          Trusted by {stats.happy_families}+ families • {stats.rating}★ rated
         </p>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           <div className="bg-white p-6 rounded-lg shadow-md">

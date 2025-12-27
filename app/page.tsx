@@ -52,8 +52,8 @@ export default async function Home() {
             "openingHours": "Mo-Su 00:00-23:59",
             "aggregateRating": {
               "@type": "AggregateRating",
-              "ratingValue": "5.0",
-              "reviewCount": "47"
+              "ratingValue": stats.rating.toString(),
+              "reviewCount": stats.total_reviews.toString()
             }
           })
         }}
